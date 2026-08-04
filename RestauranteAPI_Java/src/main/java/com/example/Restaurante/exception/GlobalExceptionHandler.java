@@ -20,6 +20,11 @@ public class GlobalExceptionHandler {
         return construirResposta(HttpStatus.BAD_REQUEST, ex.getMessage());
     }
 
+    @ExceptionHandler(CredenciaisInvalidasException.class)
+    public ResponseEntity<ErroResposta> handleCredenciaisInvalidas(CredenciaisInvalidasException ex) {
+        return construirResposta(HttpStatus.UNAUTHORIZED, ex.getMessage());
+    }
+
     @ExceptionHandler(Exception.class)
     public ResponseEntity<ErroResposta> handleGenerico(Exception ex) {
         return construirResposta(HttpStatus.INTERNAL_SERVER_ERROR, "Erro interno no servidor");

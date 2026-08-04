@@ -1,7 +1,7 @@
 services:
   mongodb:
     image: mongo:7
-    container_name: RestauranteAPI
+    container_name: restaurante-mongodb
     ports:
       - "27017:27017"
     volumes:
