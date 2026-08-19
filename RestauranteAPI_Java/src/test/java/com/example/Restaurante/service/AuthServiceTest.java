@@ -4,10 +4,10 @@ import com.example.Restaurante.document.Cliente;
 import com.example.Restaurante.document.Papel;
 import com.example.Restaurante.dto.ClienteResponse;
 import com.example.Restaurante.dto.LoginRequest;
+import com.example.Restaurante.dto.LoginResponse;
 import com.example.Restaurante.exception.CredenciaisInvalidasException;
 import com.example.Restaurante.security.ClienteUserDetails;
-import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpServletResponse;
+import com.example.Restaurante.security.JwtService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -18,13 +18,11 @@ import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
-import org.springframework.security.web.context.SecurityContextRepository;
 
 import java.time.Instant;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
@@ -34,13 +32,7 @@ public class AuthServiceTest {
     private AuthenticationManager authenticationManager;
 
     @Mock
-    private SecurityContextRepository securityContextRepository;
-
-    @Mock
-    private HttpServletRequest httpRequest;
-
-    @Mock
-    private HttpServletResponse httpResponse;
+    private JwtService jwtService;
 
     @InjectMocks
     private AuthService authService;
@@ -71,17 +63,19 @@ public class AuthServiceTest {
         when(authentication.getPrincipal()).thenReturn(userDetails);
         when(authenticationManager.authenticate(any(UsernamePasswordAuthenticationToken.class)))
                 .thenReturn(authentication);
+        when(jwtService.gerarToken(userDetails)).thenReturn("mocked-jwt-token");
 
-        ClienteResponse response = authService.login(loginRequest, httpRequest, httpResponse);
+        LoginResponse response = authService.login(loginRequest);
 
         assertNotNull(response);
-        assertEquals("João Silva", response.nome());
-        assertEquals("joao@example.com", response.email());
-        assertEquals(Papel.CLIENTE, response.papel());
-        assertEquals("123", response.id());
+        assertEquals("mocked-jwt-token", response.token());
+        assertEquals("João Silva", response.cliente().nome());
+        assertEquals("joao@example.com", response.cliente().email());
+        assertEquals(Papel.CLIENTE, response.cliente().papel());
+        assertEquals("123", response.cliente().id());
 
         verify(authenticationManager, times(1)).authenticate(any(UsernamePasswordAuthenticationToken.class));
-        verify(securityContextRepository, times(2)).saveContext(any(), any(), any());
+        verify(jwtService, times(1)).gerarToken(userDetails);
     }
 
     @Test
@@ -90,7 +84,7 @@ public class AuthServiceTest {
                 .thenThrow(new BadCredentialsException("Bad credentials"));
 
         assertThrows(CredenciaisInvalidasException.class, () -> {
-            authService.login(loginRequest, httpRequest, httpResponse);
+            authService.login(loginRequest);
         });
 
         verify(authenticationManager, times(1)).authenticate(any(UsernamePasswordAuthenticationToken.class));
