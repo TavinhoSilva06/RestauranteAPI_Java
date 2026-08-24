@@ -3,6 +3,7 @@ package com.example.Restaurante.controller;
 import com.example.Restaurante.dto.ClienteCadastroRequest;
 import com.example.Restaurante.dto.ClienteResponse;
 import com.example.Restaurante.service.ClienteService;
+import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -21,7 +22,7 @@ public class ClienteController {
     }
 
     @PostMapping
-    public ResponseEntity<ClienteResponse> cadastrar(@RequestBody ClienteCadastroRequest request) {
+    public ResponseEntity<ClienteResponse> cadastrar(@Valid @RequestBody ClienteCadastroRequest request) {
         ClienteResponse response = clienteService.cadastrar(request);
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }

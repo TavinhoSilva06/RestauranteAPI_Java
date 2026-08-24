@@ -4,6 +4,7 @@ import com.example.Restaurante.dto.ClienteResponse;
 import com.example.Restaurante.dto.LoginRequest;
 import com.example.Restaurante.dto.LoginResponse;
 import com.example.Restaurante.service.AuthService;
+import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
@@ -24,7 +25,7 @@ public class AuthController {
     }
 
     @PostMapping("/login")
-    public ResponseEntity<LoginResponse> login(@RequestBody LoginRequest request) {
+    public ResponseEntity<LoginResponse> login(@Valid @RequestBody LoginRequest request) {
         LoginResponse response = authService.login(request);
         return ResponseEntity.status(HttpStatus.OK).body(response);
     }
