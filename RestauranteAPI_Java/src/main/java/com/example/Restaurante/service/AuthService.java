@@ -1,10 +1,10 @@
 package com.example.Restaurante.service;
 
-import com.example.Restaurante.dto.ClienteResponse;
+import com.example.Restaurante.dto.Registro;
 import com.example.Restaurante.dto.LoginRequest;
 import com.example.Restaurante.dto.LoginResponse;
 import com.example.Restaurante.exception.CredenciaisInvalidasException;
-import com.example.Restaurante.security.ClienteUserDetails;
+import com.example.Restaurante.security.RegistroUserDetails;
 import com.example.Restaurante.security.JwtService;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
@@ -29,28 +29,28 @@ public class AuthService {
                     new UsernamePasswordAuthenticationToken(request.email(), request.senha())
             );
 
-            ClienteUserDetails userDetails = (ClienteUserDetails) authentication.getPrincipal();
+            RegistroUserDetails userDetails = (RegistroUserDetails) authentication.getPrincipal();
             String token = jwtService.gerarToken(userDetails);
-            ClienteResponse clienteResponse = buildClienteResponse(userDetails);
+            Registro registro = buildClienteResponse(userDetails);
 
-            return new LoginResponse(token, clienteResponse);
+            return new LoginResponse(token, registro);
 
         } catch (BadCredentialsException e) {
             throw new CredenciaisInvalidasException("E-mail ou senha inválidos");
         }
     }
 
-    public ClienteResponse me(Authentication authentication) {
-        ClienteUserDetails userDetails = (ClienteUserDetails) authentication.getPrincipal();
+    public Registro me(Authentication authentication) {
+        RegistroUserDetails userDetails = (RegistroUserDetails) authentication.getPrincipal();
         return buildClienteResponse(userDetails);
     }
 
-    private ClienteResponse buildClienteResponse(ClienteUserDetails userDetails) {
-        return new ClienteResponse(
-                userDetails.getCliente().getId(),
-                userDetails.getCliente().getNome(),
-                userDetails.getCliente().getEmail(),
-                userDetails.getCliente().getPapel()
-        );
+    private Registro buildClienteResponse(RegistroUserDetails userDetails) {
+            return new Registro(
+                    userDetails.getCliente().getId(),
+                    userDetails.getCliente().getNome(),
+                    userDetails.getCliente().getEmail(),
+                    userDetails.getCliente().getPapel()
+            );
     }
 }

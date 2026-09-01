@@ -1,6 +1,6 @@
 package com.example.Restaurante.controller;
 
-import com.example.Restaurante.dto.ClienteResponse;
+import com.example.Restaurante.dto.Registro;
 import com.example.Restaurante.dto.LoginRequest;
 import com.example.Restaurante.dto.LoginResponse;
 import com.example.Restaurante.service.AuthService;
@@ -31,8 +31,8 @@ public class AuthController {
     }
 
     @GetMapping("/me")
-    public ResponseEntity<ClienteResponse> me(Authentication authentication) {
-        ClienteResponse response = authService.me(authentication);
+    public ResponseEntity<Registro> me(Authentication authentication) {
+        Registro response = authService.me(authentication);
         return ResponseEntity.ok(response);
     }
 }

@@ -17,7 +17,7 @@ import java.time.Instant;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class Cliente {
+public class Registro {
 
     @Id
     private String id;

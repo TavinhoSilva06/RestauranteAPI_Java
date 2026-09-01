@@ -1,6 +1,6 @@
 package com.example.Restaurante.security;
 
-import com.example.Restaurante.document.Cliente;
+import com.example.Restaurante.document.Registro;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -8,27 +8,27 @@ import org.springframework.security.core.userdetails.UserDetails;
 import java.util.Collection;
 import java.util.List;
 
-public class ClienteUserDetails implements UserDetails {
+public class RegistroUserDetails implements UserDetails {
 
-    private final Cliente cliente;
+    private final Registro registro;
 
-    public ClienteUserDetails(Cliente cliente) {
-        this.cliente = cliente;
+    public RegistroUserDetails(Registro registro) {
+        this.registro = registro;
     }
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        return List.of(new SimpleGrantedAuthority("ROLE_" + cliente.getPapel().name()));
+        return List.of(new SimpleGrantedAuthority("ROLE_" + registro.getPapel().name()));
     }
 
     @Override
     public String getPassword() {
-        return cliente.getSenha();
+        return registro.getSenha();
     }
 
     @Override
     public String getUsername() {
-        return cliente.getEmail();
+        return registro.getEmail();
     }
 
     @Override
@@ -51,7 +51,7 @@ public class ClienteUserDetails implements UserDetails {
         return true;
     }
 
-    public Cliente getCliente() {
-        return cliente;
+    public Registro getCliente() {
+        return registro;
     }
 }

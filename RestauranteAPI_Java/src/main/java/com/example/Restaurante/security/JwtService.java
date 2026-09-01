@@ -1,14 +1,14 @@
 package com.example.Restaurante.security;
 
+import io.jsonwebtoken.Claims;
+import io.jsonwebtoken.Jwts;
+import io.jsonwebtoken.security.Keys;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
-import javax.crypto.Mac;
-import javax.crypto.spec.SecretKeySpec;
+import javax.crypto.SecretKey;
 import java.nio.charset.StandardCharsets;
-import java.util.Base64;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
+import java.util.Date;
 
 @Service
 public class JwtService {
@@ -19,39 +19,31 @@ public class JwtService {
     @Value("${jwt.expiration-ms}")
     private long jwtExpiration;
 
-    public String gerarToken(ClienteUserDetails userDetails) {
-        long now = System.currentTimeMillis();
-        long expiration = now + jwtExpiration;
+    public String gerarToken(RegistroUserDetails userDetails) {
+        Date now = new Date();
+        Date expiryDate = new Date(now.getTime() + jwtExpiration);
 
-        String header = "{\"alg\":\"HS256\",\"typ\":\"JWT\"}";
-        String payload = String.format(
-                "{\"sub\":\"%s\",\"id\":\"%s\",\"papel\":\"%s\",\"iat\":%d,\"exp\":%d}",
-                userDetails.getUsername(),
-                userDetails.getCliente().getId(),
-                userDetails.getCliente().getPapel().name(),
-                now / 1000,
-                expiration / 1000
-        );
+        SecretKey key = Keys.hmacShaKeyFor(jwtSecret.getBytes(StandardCharsets.UTF_8));
 
-        String headerEncoded = encodeBase64(header);
-        String payloadEncoded = encodeBase64(payload);
-        String signature = gerarAssinatura(headerEncoded, payloadEncoded);
-
-        return headerEncoded + "." + payloadEncoded + "." + signature;
+        return Jwts.builder()
+                .subject(userDetails.getUsername())
+                .claim("id", userDetails.getCliente().getId())
+                .claim("papel", userDetails.getCliente().getPapel().name())
+                .issuedAt(now)
+                .expiration(expiryDate)
+                .signWith(key)
+                .compact();
     }
 
     public String extrairEmail(String token) {
         try {
-            String[] parts = token.split("\\.");
-            if (parts.length != 3) return null;
-
-            String payload = new String(Base64.getUrlDecoder().decode(parts[1]));
-            Pattern pattern = Pattern.compile("\"sub\":\"([^\"]+)\"");
-            Matcher matcher = pattern.matcher(payload);
-            if (matcher.find()) {
-                return matcher.group(1);
-            }
-            return null;
+            SecretKey key = Keys.hmacShaKeyFor(jwtSecret.getBytes(StandardCharsets.UTF_8));
+            Claims claims = Jwts.parser()
+                    .verifyWith(key)
+                    .build()
+                    .parseSignedClaims(token)
+                    .getPayload();
+            return claims.getSubject();
         } catch (Exception e) {
             return null;
         }
@@ -59,38 +51,14 @@ public class JwtService {
 
     public boolean validarToken(String token) {
         try {
-            String[] parts = token.split("\\.");
-            if (parts.length != 3) return false;
-
-            String payload = new String(Base64.getUrlDecoder().decode(parts[1]));
-            Pattern pattern = Pattern.compile("\"exp\":(\\d+)");
-            Matcher matcher = pattern.matcher(payload);
-
-            if (!matcher.find()) return false;
-            long exp = Long.parseLong(matcher.group(1)) * 1000;
-
-            if (System.currentTimeMillis() > exp) return false;
-
-            String signature = gerarAssinatura(parts[0], parts[1]);
-            return signature.equals(parts[2]);
+            SecretKey key = Keys.hmacShaKeyFor(jwtSecret.getBytes(StandardCharsets.UTF_8));
+            Jwts.parser()
+                    .verifyWith(key)
+                    .build()
+                    .parseSignedClaims(token);
+            return true;
         } catch (Exception e) {
             return false;
         }
-    }
-
-    private String gerarAssinatura(String header, String payload) {
-        try {
-            String data = header + "." + payload;
-            Mac mac = Mac.getInstance("HmacSHA256");
-            mac.init(new SecretKeySpec(jwtSecret.getBytes(StandardCharsets.UTF_8), "HmacSHA256"));
-            byte[] signature = mac.doFinal(data.getBytes(StandardCharsets.UTF_8));
-            return Base64.getUrlEncoder().withoutPadding().encodeToString(signature);
-        } catch (Exception e) {
-            throw new RuntimeException(e);
-        }
-    }
-
-    private String encodeBase64(String input) {
-        return Base64.getUrlEncoder().withoutPadding().encodeToString(input.getBytes(StandardCharsets.UTF_8));
     }
 }

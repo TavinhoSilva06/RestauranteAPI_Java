@@ -1,11 +1,10 @@
 package com.example.Restaurante.service;
 
-import com.example.Restaurante.document.Cliente;
 import com.example.Restaurante.document.Papel;
-import com.example.Restaurante.dto.ClienteCadastroRequest;
-import com.example.Restaurante.dto.ClienteResponse;
+import com.example.Restaurante.dto.RegistroCadastroRequest;
+import com.example.Restaurante.dto.Registro;
 import com.example.Restaurante.exception.EmailJaCadastradoException;
-import com.example.Restaurante.repository.ClienteRepository;
+import com.example.Restaurante.repository.RegistroRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -21,22 +20,22 @@ import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
-public class ClienteServiceTest {
+public class RegistroServiceTest {
 
     @Mock
-    private ClienteRepository clienteRepository;
+    private RegistroRepository registroRepository;
 
     @Mock
     private PasswordEncoder passwordEncoder;
 
     @InjectMocks
-    private ClienteService clienteService;
+    private RegistroService registroService;
 
-    private ClienteCadastroRequest request;
+    private RegistroCadastroRequest request;
 
     @BeforeEach
     void setup() {
-        request = new ClienteCadastroRequest(
+        request = new RegistroCadastroRequest(
                 "João Silva",
                 "joao@example.com",
                 "senha123456"
@@ -45,10 +44,10 @@ public class ClienteServiceTest {
 
     @Test
     void testCadastrarComSucesso() {
-        when(clienteRepository.existsByEmail(request.email())).thenReturn(false);
+        when(registroRepository.existsByEmail(request.email())).thenReturn(false);
         when(passwordEncoder.encode(request.senha())).thenReturn("senha_hash_bcrypt");
 
-        Cliente clienteSalvo = Cliente.builder()
+        com.example.Restaurante.document.Registro registroSalvo = com.example.Restaurante.document.Registro.builder()
                 .id("123")
                 .nome(request.nome())
                 .email(request.email())
@@ -57,9 +56,9 @@ public class ClienteServiceTest {
                 .dataCriacao(Instant.now())
                 .build();
 
-        when(clienteRepository.save(any(Cliente.class))).thenReturn(clienteSalvo);
+        when(registroRepository.save(any(com.example.Restaurante.document.Registro.class))).thenReturn(registroSalvo);
 
-        ClienteResponse response = clienteService.cadastrar(request);
+        Registro response = registroService.cadastrar(request);
 
         assertNotNull(response);
         assertEquals("João Silva", response.nome());
@@ -67,29 +66,29 @@ public class ClienteServiceTest {
         assertEquals(Papel.CLIENTE, response.papel());
         assertNotNull(response.id());
 
-        verify(clienteRepository, times(1)).existsByEmail(request.email());
+        verify(registroRepository, times(1)).existsByEmail(request.email());
         verify(passwordEncoder, times(1)).encode(request.senha());
-        verify(clienteRepository, times(1)).save(any(Cliente.class));
+        verify(registroRepository, times(1)).save(any(com.example.Restaurante.document.Registro.class));
     }
 
     @Test
     void testCadastrarComEmailDuplicado() {
-        when(clienteRepository.existsByEmail(request.email())).thenReturn(true);
+        when(registroRepository.existsByEmail(request.email())).thenReturn(true);
 
         assertThrows(EmailJaCadastradoException.class, () -> {
-            clienteService.cadastrar(request);
+            registroService.cadastrar(request);
         });
 
-        verify(clienteRepository, times(1)).existsByEmail(request.email());
-        verify(clienteRepository, never()).save(any(Cliente.class));
+        verify(registroRepository, times(1)).existsByEmail(request.email());
+        verify(registroRepository, never()).save(any(com.example.Restaurante.document.Registro.class));
     }
 
     @Test
     void testSenhaNuncaEArmazenadaEmTexto() {
-        when(clienteRepository.existsByEmail(request.email())).thenReturn(false);
+        when(registroRepository.existsByEmail(request.email())).thenReturn(false);
         when(passwordEncoder.encode(request.senha())).thenReturn("hash_bcrypt_seguro");
 
-        Cliente clienteSalvo = Cliente.builder()
+        com.example.Restaurante.document.Registro registroSalvo = com.example.Restaurante.document.Registro.builder()
                 .id("456")
                 .nome(request.nome())
                 .email(request.email())
@@ -98,12 +97,12 @@ public class ClienteServiceTest {
                 .dataCriacao(Instant.now())
                 .build();
 
-        when(clienteRepository.save(any(Cliente.class))).thenReturn(clienteSalvo);
+        when(registroRepository.save(any(com.example.Restaurante.document.Registro.class))).thenReturn(registroSalvo);
 
-        ClienteResponse response = clienteService.cadastrar(request);
+        Registro response = registroService.cadastrar(request);
 
         assertNotEquals(request.senha(), "hash_bcrypt_seguro");
-        assertEquals("hash_bcrypt_seguro", clienteSalvo.getSenha());
+        assertEquals("hash_bcrypt_seguro", registroSalvo.getSenha());
         verify(passwordEncoder, times(1)).encode(request.senha());
     }
 }

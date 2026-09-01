@@ -2,7 +2,7 @@
 
 ## Objetivo
 
-Permitir que um cliente cadastrado autentique-se na API usando seu e-mail e senha, criando uma sessão para acessar recursos protegidos.
+Permitir que um registro cadastrado autentique-se na API usando seu e-mail e senha, criando uma sessão para acessar recursos protegidos.
 
 ## Dados necessários
 
@@ -14,28 +14,28 @@ Permitir que um cliente cadastrado autentique-se na API usando seu e-mail e senh
 1. **Validação de credenciais**: o e-mail deve estar cadastrado e a senha deve ser a mesma fornecida no cadastro (conferida via BCrypt).
 2. **Erro genérico**: se o e-mail não existir ou a senha estiver errada, a resposta é a mesma ("E-mail ou senha inválidos"), sem detalhar qual falha — protege contra enumeração de contas.
 3. **Sessão baseada em cookie**: o login cria uma sessão HTTP identificada por um cookie `JSESSIONID`, que deve ser reenviado em requisições futuras para manter a autenticação.
-4. **Validade**: a sessão persiste enquanto o navegador/cliente a mantém (padrão do Spring Security para sesões HTTP baseadas em memória).
+4. **Validade**: a sessão persiste enquanto o navegador/registro a mantém (padrão do Spring Security para sesões HTTP baseadas em memória).
 5. **Logout**: disponível via `POST /logout` para encerrar a sessão.
 
 ## Fluxo passo a passo
 
-1. O cliente envia e-mail e senha para `POST /auth/login`.
-2. O sistema procura um cliente com esse e-mail no banco.
+1. O registro envia e-mail e senha para `POST /auth/login`.
+2. O sistema procura um registro com esse e-mail no banco.
    - Se não encontrar ou a senha não conferir: responde 401 Unauthorized.
 3. Se as credenciais forem válidas:
    - O sistema cria uma sessão HTTP.
    - Grava a autenticação no contexto de segurança.
    - Retorna a sessão em um cookie `JSESSIONID`.
-4. O cliente guarda o cookie e o reenvia em requisições futuras (browsers fazem isso automaticamente).
+4. O registro guarda o cookie e o reenvia em requisições futuras (browsers fazem isso automaticamente).
 5. Ao acessar `GET /auth/me` com o cookie válido, o sistema confirma a autenticação.
-6. Para encerrar a sessão, o cliente envia `POST /auth/logout`, que invalida o cookie e limpa o contexto.
+6. Para encerrar a sessão, o registro envia `POST /auth/logout`, que invalida o cookie e limpa o contexto.
 
 ## O que fica fora deste fluxo
 
 - Recuperação/troca de senha: não faz parte do login. É um fluxo à parte.
 - Autenticação multi-fator (2FA): não está no escopo atual.
 - Integração com provedores externos (OAuth, SAML, etc.): fora do escopo.
-- Atualização de perfil do cliente após login: é uma ação separada (fora deste módulo).
+- Atualização de perfil do registro após login: é uma ação separada (fora deste módulo).
 
 ## Estratégia técnica
 

@@ -54,7 +54,7 @@ public ClienteResponse login(LoginRequest request,
 ```
 
 **Parâmetros**:
-- **`LoginRequest request`**: DTO contendo `email()` e `senha()` do cliente
+- **`LoginRequest request`**: DTO contendo `email()` e `senha()` do registro
 - **`HttpServletRequest httpRequest`**: Objeto da requisição HTTP atual (Jakarta Servlet)
 - **`HttpServletResponse httpResponse`**: Objeto da resposta HTTP (Jakarta Servlet)
 
@@ -101,10 +101,10 @@ catch (BadCredentialsException e) {
 
 **O que retorna**: 
 - Um objeto `ClienteResponse` contendo:
-  - `id`: ID do cliente
-  - `nome`: Nome completo do cliente
-  - `email`: Email do cliente
-  - `papel`: Papel/role do cliente (ex: ADMIN, USER)
+  - `id`: ID do registro
+  - `nome`: Nome completo do registro
+  - `email`: Email do registro
+  - `papel`: Papel/role do registro (ex: ADMIN, USER)
 
 ---
 
@@ -123,11 +123,11 @@ public ClienteResponse me(Authentication authentication)
 **Funcionamento**:
 1. Recebe o objeto `Authentication` (injetado automaticamente pelo Spring Security)
 2. Extrai o `ClienteUserDetails` da autenticação via `authentication.getPrincipal()`
-3. Acessa os dados do cliente através de `userDetails.getCliente()`
-4. Retorna um `ClienteResponse` com os dados do cliente autenticado
+3. Acessa os dados do registro através de `userDetails.getCliente()`
+4. Retorna um `ClienteResponse` com os dados do registro autenticado
 
 **O que retorna**: 
-Um objeto `ClienteResponse` com os dados do cliente atualmente autenticado
+Um objeto `ClienteResponse` com os dados do registro atualmente autenticado
 
 **Caso de Uso**: 
 Endpoint que retorna os dados do usuário logado (geralmente em uma rota `GET /auth/me`)
@@ -141,7 +141,7 @@ Endpoint que retorna os dados do usuário logado (geralmente em uma rota `GET /a
 │ 1. CLIENTE ENVIA CREDENCIAIS                                │
 │    POST /auth/login                                          │
 │    {                                                         │
-│      "email": "cliente@example.com",                        │
+│      "email": "registro@example.com",                        │
 │      "senha": "senha123"                                    │
 │    }                                                         │
 └────────────────┬────────────────────────────────────────────┘
@@ -174,7 +174,7 @@ Endpoint que retorna os dados do usuário logado (geralmente em uma rota `GET /a
 │    {                                                         │
 │      "id": "123",                                           │
 │      "nome": "João Silva",                                  │
-│      "email": "cliente@example.com",                        │
+│      "email": "registro@example.com",                        │
 │      "papel": "USER"                                        │
 │    }                                                         │
 │    Set-Cookie: SESSIONID=abc123def456...                    │

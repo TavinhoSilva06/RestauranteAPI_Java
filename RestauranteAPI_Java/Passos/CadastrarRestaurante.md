@@ -2,11 +2,11 @@
 
 ## Objetivo
 
-Permitir que uma pessoa crie uma conta de cliente na API do restaurante, fornecendo seus dados básicos e uma senha, para uso futuro em login e demais funcionalidades (pedidos, etc.).
+Permitir que uma pessoa crie uma conta de registro na API do restaurante, fornecendo seus dados básicos e uma senha, para uso futuro em login e demais funcionalidades (pedidos, etc.).
 
 ## Dados necessários
 
-- Nome do cliente
+- Nome do registro
 - E-mail (identifica a conta de forma única)
 - Senha (usada para autenticação futura)
 
@@ -15,16 +15,16 @@ Permitir que uma pessoa crie uma conta de cliente na API do restaurante, fornece
 1. **E-mail único**: não pode existir duas contas com o mesmo e-mail. Antes de criar a conta, o sistema verifica se já existe um cadastro com aquele e-mail; se existir, o cadastro é recusado.
 2. **Validação de formato**: nome e e-mail não podem estar vazios; o e-mail precisa ter um formato válido; a senha precisa atender a um tamanho mínimo (ex.: 8 caracteres) para evitar senhas fracas.
 3. **Senha nunca é armazenada em texto puro**: antes de salvar, a senha é transformada com um algoritmo de hash (ex.: BCrypt). O sistema nunca guarda nem expõe a senha original.
-4. **Papel padrão**: toda conta criada por esse fluxo público recebe o papel de "cliente". Papéis administrativos (ex.: funcionário do restaurante) não são atribuídos por este cadastro.
+4. **Papel padrão**: toda conta criada por esse fluxo público recebe o papel de "registro". Papéis administrativos (ex.: funcionário do restaurante) não são atribuídos por este cadastro.
 
 ## Fluxo passo a passo
 
-1. O cliente envia nome, e-mail e senha.
+1. O registro envia nome, e-mail e senha.
 2. O sistema valida o formato dos dados recebidos. Se algo estiver inválido, o cadastro é recusado e o motivo é informado.
 3. O sistema verifica se o e-mail já está cadastrado. Se estiver, o cadastro é recusado informando que o e-mail já está em uso (sem revelar mais detalhes, por segurança).
 4. Se passou nas validações, a senha é transformada em hash.
-5. Os dados (nome, e-mail, senha em hash, papel "cliente") são salvos como uma nova conta.
-6. O sistema confirma o cadastro para o cliente, retornando os dados básicos da conta criada — **nunca a senha**, nem o hash dela.
+5. Os dados (nome, e-mail, senha em hash, papel "registro") são salvos como uma nova conta.
+6. O sistema confirma o cadastro para o registro, retornando os dados básicos da conta criada — **nunca a senha**, nem o hash dela.
 
 ## O que fica fora deste fluxo
 
@@ -70,7 +70,7 @@ POST /clientes
     → ClienteService verifica ClienteRepository.existsByEmail(email)
         → se true: lança EmailJaCadastradoException → GlobalExceptionHandler → 409
     → ClienteService codifica a senha com PasswordEncoder.encode(senha)
-    → ClienteService monta Cliente(papel = CLIENTE) e chama ClienteRepository.save(cliente)
+    → ClienteService monta Cliente(papel = CLIENTE) e chama ClienteRepository.save(registro)
     → ClienteService mapeia Cliente salvo → ClienteResponse (sem senha)
   → ClienteController retorna 201 Created com ClienteResponse
 ```

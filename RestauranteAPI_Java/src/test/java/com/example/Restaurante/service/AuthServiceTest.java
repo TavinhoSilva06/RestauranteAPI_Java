@@ -1,12 +1,11 @@
 package com.example.Restaurante.service;
 
-import com.example.Restaurante.document.Cliente;
 import com.example.Restaurante.document.Papel;
-import com.example.Restaurante.dto.ClienteResponse;
+import com.example.Restaurante.dto.Registro;
 import com.example.Restaurante.dto.LoginRequest;
 import com.example.Restaurante.dto.LoginResponse;
 import com.example.Restaurante.exception.CredenciaisInvalidasException;
-import com.example.Restaurante.security.ClienteUserDetails;
+import com.example.Restaurante.security.RegistroUserDetails;
 import com.example.Restaurante.security.JwtService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -38,14 +37,14 @@ public class AuthServiceTest {
     private AuthService authService;
 
     private LoginRequest loginRequest;
-    private Cliente cliente;
-    private ClienteUserDetails userDetails;
+    private com.example.Restaurante.document.Registro registro;
+    private RegistroUserDetails userDetails;
 
     @BeforeEach
     void setup() {
         loginRequest = new LoginRequest("joao@example.com", "senha123456");
 
-        cliente = Cliente.builder()
+        registro = com.example.Restaurante.document.Registro.builder()
                 .id("123")
                 .nome("João Silva")
                 .email("joao@example.com")
@@ -54,7 +53,7 @@ public class AuthServiceTest {
                 .dataCriacao(Instant.now())
                 .build();
 
-        userDetails = new ClienteUserDetails(cliente);
+        userDetails = new RegistroUserDetails(registro);
     }
 
     @Test
@@ -95,7 +94,7 @@ public class AuthServiceTest {
         Authentication authentication = mock(Authentication.class);
         when(authentication.getPrincipal()).thenReturn(userDetails);
 
-        ClienteResponse response = authService.me(authentication);
+        Registro response = authService.me(authentication);
 
         assertNotNull(response);
         assertEquals("João Silva", response.nome());

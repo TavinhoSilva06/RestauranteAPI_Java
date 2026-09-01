@@ -2,7 +2,7 @@ package com.example.Restaurante.dto;
 
 import com.example.Restaurante.document.Papel;
 
-public record ClienteResponse(
+public record Registro(
         String id,
         String nome,
         String email,

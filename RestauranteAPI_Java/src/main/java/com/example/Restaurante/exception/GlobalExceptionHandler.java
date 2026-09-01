@@ -2,6 +2,7 @@ package com.example.Restaurante.exception;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
@@ -23,6 +24,11 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(CredenciaisInvalidasException.class)
     public ResponseEntity<ErroResposta> handleCredenciaisInvalidas(CredenciaisInvalidasException ex) {
         return construirResposta(HttpStatus.UNAUTHORIZED, ex.getMessage());
+    }
+
+    @ExceptionHandler(AccessDeniedException.class)
+    public ResponseEntity<ErroResposta> handleAccessDenied(AccessDeniedException ex) {
+        return construirResposta(HttpStatus.FORBIDDEN, "Acesso negado");
     }
 
     @ExceptionHandler(Exception.class)
