@@ -6,7 +6,7 @@ import com.example.Restaurante.dto.Registro;
 import com.example.Restaurante.dto.FuncionarioCadastroRequest;
 import com.example.Restaurante.exception.EmailJaCadastradoException;
 import com.example.Restaurante.exception.ValidacaoException;
-import com.example.Restaurante.repository.RegistroRepository;
+import com.example.Restaurante.repository.RegistroMongoTemplate;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -16,11 +16,11 @@ import java.util.List;
 @Service
 public class RegistroService {
 
-    private final RegistroRepository registroRepository;
+    private final RegistroMongoTemplate registroMongoTemplate;
     private final PasswordEncoder passwordEncoder;
 
-    public RegistroService(RegistroRepository registroRepository, PasswordEncoder passwordEncoder) {
-        this.registroRepository = registroRepository;
+    public RegistroService(RegistroMongoTemplate registroMongoTemplate, PasswordEncoder passwordEncoder) {
+        this.registroMongoTemplate = registroMongoTemplate;
         this.passwordEncoder = passwordEncoder;
     }
 
@@ -29,20 +29,25 @@ public class RegistroService {
     }
 
     public Registro cadastrarFuncionario(FuncionarioCadastroRequest request) {
-        if (request.papel() == Papel.CLIENTE) {
+        //if (request.papel() == Papel.FUNCIONARIO || request.papel() == Papel.ADMIN) {
+        //    return criarCliente(request.nome(), request.email(), request.senha(), Papel.ADMIN);
+        //}
+        //throw new ValidacaoException("Papel deve ser FUNCIONARIO ou ADMIN");
+
+        if (request.papel() != Papel.FUNCIONARIO && request.papel() != Papel.ADMIN) {
             throw new ValidacaoException("Papel deve ser FUNCIONARIO ou ADMIN");
         }
         return criarCliente(request.nome(), request.email(), request.senha(), request.papel());
     }
 
     public List<Registro> listarTodos() {
-        return registroRepository.findAllClientes().stream()
+        return registroMongoTemplate.findAllClientes().stream()
                 .map(this::toResponse)
                 .toList();
     }
 
     private Registro criarCliente(String nome, String email, String senha, Papel papel) {
-        if (registroRepository.existsByEmail(email)) {
+        if (registroMongoTemplate.existsByEmail(email)) {
             throw new EmailJaCadastradoException(email);
         }
 
@@ -54,7 +59,7 @@ public class RegistroService {
                 .dataCriacao(Instant.now())
                 .build();
 
-        com.example.Restaurante.document.Registro salvo = registroRepository.save(registro);
+        com.example.Restaurante.document.Registro salvo = registroMongoTemplate.save(registro);
         return toResponse(salvo);
     }
 

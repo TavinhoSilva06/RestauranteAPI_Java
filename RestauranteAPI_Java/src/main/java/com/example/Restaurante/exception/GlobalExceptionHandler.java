@@ -31,6 +31,21 @@ public class GlobalExceptionHandler {
         return construirResposta(HttpStatus.FORBIDDEN, "Acesso negado");
     }
 
+    @ExceptionHandler(CategoriaNaoEncontradaException.class)
+    public ResponseEntity<ErroResposta> handleCategoriaNaoEncontrada(CategoriaNaoEncontradaException ex) {
+        return construirResposta(HttpStatus.NOT_FOUND, ex.getMessage());
+    }
+
+    @ExceptionHandler(CategoriaEmUsoException.class)
+    public ResponseEntity<ErroResposta> handleCategoriaEmUso(CategoriaEmUsoException ex) {
+        return construirResposta(HttpStatus.CONFLICT, ex.getMessage());
+    }
+
+    @ExceptionHandler(PratoNaoEncontradoException.class)
+    public ResponseEntity<ErroResposta> handlePratoNaoEncontrado(PratoNaoEncontradoException ex) {
+        return construirResposta(HttpStatus.NOT_FOUND, ex.getMessage());
+    }
+
     @ExceptionHandler(Exception.class)
     public ResponseEntity<ErroResposta> handleGenerico(Exception ex) {
         return construirResposta(HttpStatus.INTERNAL_SERVER_ERROR, "Erro interno no servidor");

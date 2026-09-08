@@ -11,11 +11,11 @@ import java.util.List;
 import java.util.Optional;
 
 @Repository
-public class RegistroRepository {
+public class RegistroMongoTemplate {
 
     private final MongoTemplate mongoTemplate;
 
-    public RegistroRepository(MongoTemplate mongoTemplate) {
+    public RegistroMongoTemplate(MongoTemplate mongoTemplate) {
         this.mongoTemplate = mongoTemplate;
     }
 

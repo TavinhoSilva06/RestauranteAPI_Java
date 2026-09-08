@@ -35,6 +35,8 @@ public class SecurityConfig {
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers(HttpMethod.POST, "/clientes").permitAll()
                         .requestMatchers("/auth/login").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/categorias", "/categorias/**").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/pratos", "/pratos/**").permitAll()
                         .anyRequest().authenticated()
                 )
                 .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);

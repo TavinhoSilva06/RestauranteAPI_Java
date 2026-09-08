@@ -4,7 +4,7 @@ import com.example.Restaurante.document.Papel;
 import com.example.Restaurante.dto.RegistroCadastroRequest;
 import com.example.Restaurante.dto.Registro;
 import com.example.Restaurante.exception.EmailJaCadastradoException;
-import com.example.Restaurante.repository.RegistroRepository;
+import com.example.Restaurante.repository.RegistroMongoTemplate;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -23,7 +23,7 @@ import static org.mockito.Mockito.*;
 public class RegistroServiceTest {
 
     @Mock
-    private RegistroRepository registroRepository;
+    private RegistroMongoTemplate registroMongoTemplate;
 
     @Mock
     private PasswordEncoder passwordEncoder;
@@ -44,7 +44,7 @@ public class RegistroServiceTest {
 
     @Test
     void testCadastrarComSucesso() {
-        when(registroRepository.existsByEmail(request.email())).thenReturn(false);
+        when(registroMongoTemplate.existsByEmail(request.email())).thenReturn(false);
         when(passwordEncoder.encode(request.senha())).thenReturn("senha_hash_bcrypt");
 
         com.example.Restaurante.document.Registro registroSalvo = com.example.Restaurante.document.Registro.builder()
@@ -56,7 +56,7 @@ public class RegistroServiceTest {
                 .dataCriacao(Instant.now())
                 .build();
 
-        when(registroRepository.save(any(com.example.Restaurante.document.Registro.class))).thenReturn(registroSalvo);
+        when(registroMongoTemplate.save(any(com.example.Restaurante.document.Registro.class))).thenReturn(registroSalvo);
 
         Registro response = registroService.cadastrar(request);
 
@@ -66,26 +66,26 @@ public class RegistroServiceTest {
         assertEquals(Papel.CLIENTE, response.papel());
         assertNotNull(response.id());
 
-        verify(registroRepository, times(1)).existsByEmail(request.email());
+        verify(registroMongoTemplate, times(1)).existsByEmail(request.email());
         verify(passwordEncoder, times(1)).encode(request.senha());
-        verify(registroRepository, times(1)).save(any(com.example.Restaurante.document.Registro.class));
+        verify(registroMongoTemplate, times(1)).save(any(com.example.Restaurante.document.Registro.class));
     }
 
     @Test
     void testCadastrarComEmailDuplicado() {
-        when(registroRepository.existsByEmail(request.email())).thenReturn(true);
+        when(registroMongoTemplate.existsByEmail(request.email())).thenReturn(true);
 
         assertThrows(EmailJaCadastradoException.class, () -> {
             registroService.cadastrar(request);
         });
 
-        verify(registroRepository, times(1)).existsByEmail(request.email());
-        verify(registroRepository, never()).save(any(com.example.Restaurante.document.Registro.class));
+        verify(registroMongoTemplate, times(1)).existsByEmail(request.email());
+        verify(registroMongoTemplate, never()).save(any(com.example.Restaurante.document.Registro.class));
     }
 
     @Test
     void testSenhaNuncaEArmazenadaEmTexto() {
-        when(registroRepository.existsByEmail(request.email())).thenReturn(false);
+        when(registroMongoTemplate.existsByEmail(request.email())).thenReturn(false);
         when(passwordEncoder.encode(request.senha())).thenReturn("hash_bcrypt_seguro");
 
         com.example.Restaurante.document.Registro registroSalvo = com.example.Restaurante.document.Registro.builder()
@@ -97,7 +97,7 @@ public class RegistroServiceTest {
                 .dataCriacao(Instant.now())
                 .build();
 
-        when(registroRepository.save(any(com.example.Restaurante.document.Registro.class))).thenReturn(registroSalvo);
+        when(registroMongoTemplate.save(any(com.example.Restaurante.document.Registro.class))).thenReturn(registroSalvo);
 
         Registro response = registroService.cadastrar(request);
 

@@ -2,7 +2,7 @@ package com.example.Restaurante.config;
 
 import com.example.Restaurante.document.Registro;
 import com.example.Restaurante.document.Papel;
-import com.example.Restaurante.repository.RegistroRepository;
+import com.example.Restaurante.repository.RegistroMongoTemplate;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.ApplicationArguments;
 import org.springframework.boot.ApplicationRunner;
@@ -14,7 +14,7 @@ import java.time.Instant;
 @Component
 public class AdminSeedRunner implements ApplicationRunner {
 
-    private final RegistroRepository registroRepository;
+    private final RegistroMongoTemplate registroMongoTemplate;
     private final PasswordEncoder passwordEncoder;
 
     @Value("${app.admin-seed.nome}")
@@ -26,14 +26,14 @@ public class AdminSeedRunner implements ApplicationRunner {
     @Value("${app.admin-seed.senha}")
     private String adminSenha;
 
-    public AdminSeedRunner(RegistroRepository registroRepository, PasswordEncoder passwordEncoder) {
-        this.registroRepository = registroRepository;
+    public AdminSeedRunner(RegistroMongoTemplate registroMongoTemplate, PasswordEncoder passwordEncoder) {
+        this.registroMongoTemplate = registroMongoTemplate;
         this.passwordEncoder = passwordEncoder;
     }
 
     @Override
     public void run(ApplicationArguments args) {
-        if (registroRepository.existsByPapel(Papel.ADMIN)) {
+        if (registroMongoTemplate.existsByPapel(Papel.ADMIN)) {
             return;
         }
 
@@ -45,6 +45,6 @@ public class AdminSeedRunner implements ApplicationRunner {
                 .dataCriacao(Instant.now())
                 .build();
 
-        registroRepository.save(admin);
+        registroMongoTemplate.save(admin);
     }
 }
