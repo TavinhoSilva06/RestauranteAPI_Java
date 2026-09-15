@@ -46,6 +46,21 @@ public class GlobalExceptionHandler {
         return construirResposta(HttpStatus.NOT_FOUND, ex.getMessage());
     }
 
+    @ExceptionHandler(PedidoNaoEncontradoException.class)
+    public ResponseEntity<ErroResposta> handlePedidoNaoEncontrado(PedidoNaoEncontradoException ex) {
+        return construirResposta(HttpStatus.NOT_FOUND, ex.getMessage());
+    }
+
+    @ExceptionHandler(PratoIndisponivelException.class)
+    public ResponseEntity<ErroResposta> handlePratoIndisponivel(PratoIndisponivelException ex) {
+        return construirResposta(HttpStatus.CONFLICT, ex.getMessage());
+    }
+
+    @ExceptionHandler(TransicaoStatusInvalidaException.class)
+    public ResponseEntity<ErroResposta> handleTransicaoStatusInvalida(TransicaoStatusInvalidaException ex) {
+        return construirResposta(HttpStatus.CONFLICT, ex.getMessage());
+    }
+
     @ExceptionHandler(Exception.class)
     public ResponseEntity<ErroResposta> handleGenerico(Exception ex) {
         return construirResposta(HttpStatus.INTERNAL_SERVER_ERROR, "Erro interno no servidor");
